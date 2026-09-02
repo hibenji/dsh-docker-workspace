@@ -19,7 +19,7 @@ jobs:
           node-version: 22
       - run: npm install
       - name: Verify committed runtime loads before any build
-        run: node -e "import('./dist/docker-workspace.js').then(m => { if (!m.DockerWorkspaceRuntime) process.exit(1) })"
+        run: node -e "import('./dist/index.js').then(m => { if (!m.DockerWorkspaceRuntime) process.exit(1) })"
       - run: npm run check
       - name: Verify package contains runtime
         run: |
@@ -35,20 +35,14 @@ jobs:
           node-version: 22
       - name: Install pnpm 11.7.0
         run: npm install -g pnpm@11.7.0
-      - name: Reproduce Harness git-plugin installation on Windows
+      - name: Install through the real Harness plugin command
         shell: pwsh
         run: |
-          New-Item -ItemType Directory -Path profile | Out-Null
-          Set-Location profile
-          '{"name":"git-install-smoke","private":true}' | Set-Content -Encoding utf8 package.json
-          @'
-          packages:
-            - .
-          autoInstallPeers: false
-          '@ | Set-Content -Encoding utf8 pnpm-workspace.yaml
-          pnpm add "github:hibenji/dsh-docker-workspace#$env:GITHUB_SHA"
+          $env:DSH_HOME = Join-Path $env:RUNNER_TEMP 'dsh-home'
+          npx --yes @deepseek-ai/dsh plugin --profile ci add "github:hibenji/dsh-docker-workspace#$env:GITHUB_SHA"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          if (-not (Test-Path 'node_modules/@hibenji/dsh-docker-workspace/dist/index.js')) { throw 'prebuilt dist/index.js missing after git install' }
+          $installed = Join-Path $env:DSH_HOME 'profiles/ci/node_modules/@hibenji/dsh-docker-workspace/dist/index.js'
+          if (-not (Test-Path $installed)) { throw "prebuilt dist/index.js missing after Harness install: $installed" }
 
   docker-smoke:
     runs-on: ubuntu-latest
