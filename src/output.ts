@@ -1,6 +1,6 @@
 import type { SubprocessOutputRead, SubprocessOutputReader } from '@deepseek-ai/dsh-subprocess'
 
-function trimUtf8Head(buffer: Buffer, maxBytes: number): Buffer {
+function trimUtf8Head(buffer: Buffer<ArrayBufferLike>, maxBytes: number): Buffer<ArrayBufferLike> {
   if (buffer.length <= maxBytes) return buffer
   let start = buffer.length - maxBytes
   while (start < buffer.length && (buffer[start]! & 0xc0) === 0x80) start++
@@ -10,7 +10,7 @@ function trimUtf8Head(buffer: Buffer, maxBytes: number): Buffer {
 export class TailOutputReader implements SubprocessOutputReader {
   readonly maxBytes: number
   private readonly spillPathProvider: (() => string | undefined) | undefined
-  private tail = Buffer.alloc(0)
+  private tail: Buffer<ArrayBufferLike> = Buffer.alloc(0)
   private total = 0
 
   constructor(maxBytes: number, spillPathProvider?: () => string | undefined) {
@@ -19,7 +19,7 @@ export class TailOutputReader implements SubprocessOutputReader {
     this.spillPathProvider = spillPathProvider
   }
 
-  append(chunk: Buffer | string): void {
+  append(chunk: Buffer<ArrayBufferLike> | string): void {
     const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk)
     this.total += bytes.length
     this.tail = trimUtf8Head(Buffer.concat([this.tail, bytes]), this.maxBytes)
