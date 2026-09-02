@@ -4,6 +4,7 @@
   "description": "Isolated per-session Docker workspaces for DeepSeek Harness",
   "type": "module",
   "license": "MIT",
+  "packageManager": "pnpm@11.7.0",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "exports": {
@@ -57,7 +58,7 @@
     "@deepseek-ai/schemastery": "3.18.1"
   },
   "engines": {
-    "node": ">=22"
+    "node": "^22.19.0 || >=24.0.0"
   },
   "repository": {
     "type": "git",
