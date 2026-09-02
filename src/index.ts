@@ -1,4 +1,5 @@
-export { DockerWorkspaceRuntime } from './docker-workspace.js'
+export { DockerWorkspaceRuntime } from './docker-workspace-agent.js'
+export type { DockerSessionWorkspace } from './docker-workspace.js'
 export { DockerFileSystem } from './docker-fs.js'
 export { DockerSubprocessRuntime } from './docker-subprocess.js'
 export { resolveConfig } from './config.js'
