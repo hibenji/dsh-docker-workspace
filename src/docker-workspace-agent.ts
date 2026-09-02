@@ -1,3 +1,4 @@
+import { resolve } from 'node:path'
 import type { Context } from '@deepseek-ai/cordis'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import {
@@ -38,7 +39,7 @@ export class DockerWorkspaceRuntime extends BaseDockerWorkspaceRuntime {
     }
     return {
       sessionId: agent.id,
-      sourceRoot,
+      sourceRoot: resolve(sourceRoot),
       ...(agent.session.header.parentSession === undefined ? {} : { parentSession: agent.session.header.parentSession }),
       ...(agent.session.header.origin === undefined ? {} : { origin: agent.session.header.origin }),
     }
