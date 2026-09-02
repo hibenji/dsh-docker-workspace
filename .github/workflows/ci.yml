@@ -18,43 +18,37 @@ jobs:
         with:
           node-version: 22
       - run: npm install
+      - name: Verify committed runtime loads before any build
+        run: node -e "import('./dist/docker-workspace.js').then(m => { if (!m.DockerWorkspaceRuntime) process.exit(1) })"
       - run: npm run check
-      - name: Verify package contains built runtime
+      - name: Verify package contains runtime
         run: |
           npm pack --dry-run
           test -f dist/index.js
           test -f dist/install-preset.js
-      - name: Upload built runtime
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist
-          path: dist
-          if-no-files-found: error
 
-  git-install:
-    runs-on: ubuntu-latest
+  git-install-windows:
+    runs-on: windows-latest
     steps:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - name: Install pnpm 11.7.0
         run: npm install -g pnpm@11.7.0
-      - name: Reproduce Harness git-plugin installation
-        shell: bash
+      - name: Reproduce Harness git-plugin installation on Windows
+        shell: pwsh
         run: |
-          set -euo pipefail
-          mkdir profile
-          cd profile
-          printf '{"name":"git-install-smoke","private":true}\n' > package.json
-          cat > pnpm-workspace.yaml <<EOF
+          New-Item -ItemType Directory -Path profile | Out-Null
+          Set-Location profile
+          '{"name":"git-install-smoke","private":true}' | Set-Content -Encoding utf8 package.json
+          @'
           packages:
             - .
           autoInstallPeers: false
-          allowBuilds:
-            '@hibenji/dsh-docker-workspace@https://codeload.github.com/hibenji/dsh-docker-workspace/tar.gz/${GITHUB_SHA}': true
-          EOF
-          pnpm add "github:hibenji/dsh-docker-workspace#${GITHUB_SHA}"
-          test -f node_modules/@hibenji/dsh-docker-workspace/dist/index.js
+          '@ | Set-Content -Encoding utf8 pnpm-workspace.yaml
+          pnpm add "github:hibenji/dsh-docker-workspace#$env:GITHUB_SHA"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          if (-not (Test-Path 'node_modules/@hibenji/dsh-docker-workspace/dist/index.js')) { throw 'prebuilt dist/index.js missing after git install' }
 
   docker-smoke:
     runs-on: ubuntu-latest
