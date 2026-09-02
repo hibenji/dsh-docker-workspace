@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import test from 'node:test'
 import type { Agent } from '@deepseek-ai/dsh-agent'
 import type { DockerSessionWorkspace } from '../src/docker-workspace.ts'
-import { callingAgent, DockerWorkspaceRuntime } from '../src/docker-workspace-agent.ts'
+import { callingAgent, readyWorkspaceForCallingAgent } from '../src/agent-routing.ts'
 
 function fakeAgent(id: string, cwd: string): Agent {
   return {
@@ -34,7 +34,7 @@ test('callingAgent falls back to an Agent-owned Cordis scope for direct calls', 
   assert.equal(callingAgent(ctx), staticAgent)
 })
 
-test('workspace identity and synchronous peek route by the initiating Agent', () => {
+test('synchronous workspace lookup routes by the initiating Agent', () => {
   const initiator = fakeAgent('session-a', '/project/a')
   const staticAgent = fakeAgent('session-b', '/project/b')
   const state = {
@@ -46,17 +46,10 @@ test('workspace identity and synchronous peek route by the initiating Agent', ()
     containerName: 'dsh-session-a',
     helperPath: '/staging/session-a/runtime/process-wrapper.sh',
   } satisfies DockerSessionWorkspace
-
-  const runtime = {
-    ctx: {
-      agents: { currentInitiator: () => initiator },
-      agent: staticAgent,
-    },
-    ready: new Map([[initiator.id, state]]),
+  const ctx = {
+    agents: { currentInitiator: () => initiator },
+    agent: staticAgent,
   } as never
 
-  const identity = DockerWorkspaceRuntime.prototype.currentIdentity.call(runtime)
-  assert.equal(identity.sessionId, initiator.id)
-  assert.equal(identity.sourceRoot, '/project/a')
-  assert.equal(DockerWorkspaceRuntime.prototype.peekWorkspace.call(runtime), state)
+  assert.equal(readyWorkspaceForCallingAgent(ctx, new Map([[initiator.id, state]])), state)
 })
