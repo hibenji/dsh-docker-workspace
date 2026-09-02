@@ -3,7 +3,8 @@ import { dirname, join } from 'node:path';
 import { mkdir, readFile, rename, rm, writeFile } from 'node:fs/promises';
 import z from '@deepseek-ai/schemastery';
 import { resolveConfig } from './config.js';
-import { renderDockerPreset, runtimePaths } from './preset-template.js';
+import { renderDockerPreset } from './preset-template.js';
+import { runtimePaths } from './runtime-paths.js';
 export const name = 'docker-workspace-preset-installer';
 export const inject = ['agentPresets'];
 export const Config = z.object({
