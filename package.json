@@ -9,7 +9,7 @@
   "exports": {
     ".": "./dist/index.js",
     "./install-preset": "./dist/install-preset.js",
-    "./docker-workspace": "./dist/docker-workspace.js",
+    "./docker-workspace": "./dist/docker-workspace-agent.js",
     "./docker-fs": "./dist/docker-fs.js",
     "./docker-subprocess": "./dist/docker-subprocess.js"
   },
