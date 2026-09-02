@@ -5,7 +5,8 @@ import type { Context } from '@deepseek-ai/cordis'
 import z from '@deepseek-ai/schemastery'
 import type {} from '@deepseek-ai/dsh-agent-presets'
 import { resolveConfig, type DockerWorkspaceConfig } from './config.js'
-import { renderDockerPreset, runtimePaths } from './preset-template.js'
+import { renderDockerPreset } from './preset-template.js'
+import { runtimePaths } from './runtime-paths.js'
 
 export const name = 'docker-workspace-preset-installer'
 export const inject = ['agentPresets']
