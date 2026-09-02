@@ -31,6 +31,31 @@ jobs:
           path: dist
           if-no-files-found: error
 
+  git-install:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install pnpm 11.7.0
+        run: npm install -g pnpm@11.7.0
+      - name: Reproduce Harness git-plugin installation
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir profile
+          cd profile
+          printf '{"name":"git-install-smoke","private":true}\n' > package.json
+          cat > pnpm-workspace.yaml <<EOF
+          packages:
+            - .
+          autoInstallPeers: false
+          allowBuilds:
+            '@hibenji/dsh-docker-workspace@https://codeload.github.com/hibenji/dsh-docker-workspace/tar.gz/${GITHUB_SHA}': true
+          EOF
+          pnpm add "github:hibenji/dsh-docker-workspace#${GITHUB_SHA}"
+          test -f node_modules/@hibenji/dsh-docker-workspace/dist/index.js
+
   docker-smoke:
     runs-on: ubuntu-latest
     steps:
