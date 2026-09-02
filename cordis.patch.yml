@@ -1,0 +1,12 @@
+# Install the host-side preset materializer. It creates/refreshes the
+# `docker-isolated` agent preset in the user's normal preset directory, so the
+# existing Harness new-chat preset picker becomes the opt-in UI.
+- insert:
+    - id: docker-workspace-preset-installer
+      name: '@hibenji/dsh-docker-workspace/install-preset'
+      config:
+        presetId: docker-isolated
+        autoBuildImage: true
+        removeContainerOnAgentDispose: true
+        keepWorkspace: true
+        network: bridge
