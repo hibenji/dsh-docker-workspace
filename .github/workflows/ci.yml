@@ -26,6 +26,14 @@ jobs:
           npm pack --dry-run
           test -f dist/index.js
           test -f dist/install-preset.js
+          test -f dist/docker-workspace-agent.js
+          test -f dist/runtime-paths.js
+      - name: Upload rebuilt runtime
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          if-no-files-found: error
 
   git-install-windows:
     runs-on: windows-latest
