@@ -32,9 +32,7 @@
     "test": "node --test --experimental-strip-types tests/*.test.ts",
     "test:docker": "DSH_DOCKER_SMOKE=1 node --test --experimental-strip-types tests/docker-smoke.test.ts",
     "check": "npm run verify:syntax && npm test && npm run build",
-    "verify:syntax": "find src tests -name '*.ts' -print0 | xargs -0 -n1 node --experimental-strip-types --check",
-    "prepare": "npm run build",
-    "prepack": "npm run build"
+    "verify:syntax": "find src tests -name '*.ts' -print0 | xargs -0 -n1 node --experimental-strip-types --check"
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.2",
